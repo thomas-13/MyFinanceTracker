@@ -27,9 +27,9 @@ const EditableCell = <TData extends object, TValue>({
   table,
   editable,
 }: EditableCellProps<TData, TValue>) => {
-  const initialValue = getValue() as string;
+  const initialValue = getValue();
   const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState<TValue>(initialValue);
 
   const onBlur = () => {
     setIsEditing(false);
@@ -44,7 +44,7 @@ const EditableCell = <TData extends object, TValue>({
       {isEditing ? (
         <input
           value={value as string}
-          onChange={(e) => setValue(e.target.value as unknown as TValue)}
+          onChange={(e) => setValue(e.target.value as TValue)}
           autoFocus
           onBlur={onBlur}
           style={{ width: "100%" }}
@@ -52,7 +52,7 @@ const EditableCell = <TData extends object, TValue>({
       ) : typeof value === "string" ? (
         value
       ) : (
-        value?.toString() || ""
+        String(value ?? "") 
       )}
     </div>
   );
