@@ -74,6 +74,7 @@ export const FinancialRecordList = () => {
         cell: (info) => (
           <EditableCell
             {...info}
+            updateRecord = {updateRecord}
             editable={true}
           />
         ),

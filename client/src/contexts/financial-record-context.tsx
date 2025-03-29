@@ -3,11 +3,11 @@ import { createContext, useState, useContext, useEffect } from 'react';
 
 
 export interface FinancialRecord {
-    id?: string;
+    _id?: string;
     userId: string;
     date: Date;
     description: string;
-    amount: Number;
+    amount: number;
     category: string;
     paymentMethod: string;
 }
@@ -15,8 +15,8 @@ export interface FinancialRecord {
 interface FinancialRecordContextType{
     records: FinancialRecord[];
     addRecord: (record: FinancialRecord) => void;
-    // updateRecord: (id: string, newRecorde: FinancialRecord) => void;
-    // delteRecord: (id: string) => void;
+    updateRecord: (id: string, newRecorde: FinancialRecord) => void;
+    deleteRecord: (id: string) => void;
 }
 
 export const FinancialRecordProvider = ({children}: {children: React.ReactNode}) =>{
@@ -47,22 +47,61 @@ export const FinancialRecordProvider = ({children}: {children: React.ReactNode})
                 'Content-Type': 'application/json'
             }
         });
-
-    try{
-        if(response.ok){
-            const newRecord = await response.json();
-            setRecords((prev) => [...prev, newRecord]);
+        try{
+            if(response.ok){
+                const newRecord = await response.json();
+                setRecords((prev) => [...prev, newRecord]);
+            }
         }
-    }
-    catch(err){
-        console.error(err);
-    }
-    
-
+        catch(err){
+            console.error(err);
+        }
     };
 
+    const updateRecord = async (id: string, newRecord: FinancialRecord) => {
+        const response = await fetch(`http://localhost:3002/financial-records/${id}`, {
+            method : "PUT",
+            body: JSON.stringify(newRecord),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        try{
+            if(response.ok){
+                const newRecord = await response.json();
+                setRecords((prev) => prev.map((record)=>{
+                    if(record._id === id){
+                        return newRecord;
+                    }
+                    else{
+                        return record;
+                    }
+                }))
+            }
+        }
+        catch(err){
+            console.error(err);
+        }
+    };
+
+    const deleteRecord = async (id: string ) =>{
+        const response = await fetch(`http://localhost:3002/financial-records${id}`, {
+            method : "DELETE",
+        });
+        try{
+            if(response.ok){
+                const deleteRecord = await response.json();
+                setRecords((prev) => prev.filter(record => record._id !== deleteRecord.id));
+            }
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
+
+
     return (
-        <FinancialRecordContext.Provider value={{records, addRecord}}>
+        <FinancialRecordContext.Provider value={{records, addRecord, updateRecord, deleteRecord}}>
             {children}
         </FinancialRecordContext.Provider>
     )
