@@ -85,13 +85,16 @@ export const FinancialRecordProvider = ({children}: {children: React.ReactNode})
     };
 
     const deleteRecord = async (id: string ) =>{
-        const response = await fetch(`http://localhost:3002/financial-records${id}`, {
+        const response = await fetch(`http://localhost:3002/financial-records/${id}`, {
             method : "DELETE",
         });
         try{
             if(response.ok){
-                const deleteRecord = await response.json();
-                setRecords((prev) => prev.filter(record => record._id !== deleteRecord.id));
+                setRecords((prev) => prev.filter(record => record._id !== id));
+                await response.json(); 
+            }
+            else {
+                console.error("Failed to delete record:", response.status);
             }
         }
         catch(err){
